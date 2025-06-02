@@ -31,6 +31,9 @@ function git_sparse_clone() {
 git clone --depth=1 https://github.com/kongfl888/luci-app-adguardhome package/luci-app-adguardhome
 git clone --depth=1 https://github.com/Jason6111/luci-app-netdata package/luci-app-netdata
 # git_sparse_clone master https://github.com/syb999/openwrt-19.07.1 package/network/services/msd_lite
+git clone --depth=1 https://github.com/dopikan1/nf_deaf-openwrt.git package/kernel/nf_deaf
+
+
 
 # 科学上网插件
 git clone --depth=1 -b main https://github.com/fw876/helloworld package/luci-app-ssr-plus
@@ -117,6 +120,9 @@ sed -i 's|admin\\|admin\\/services\\|g' feeds/luci/applications/luci-app-dockerm
 
 # 取消对 samba4 的菜单调整
 # sed -i '/samba4/s/^/#/' package/lean/default-settings/files/zzz-default-settings
+
+
+
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
