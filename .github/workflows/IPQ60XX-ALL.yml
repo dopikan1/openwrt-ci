@@ -96,7 +96,12 @@ jobs:
         ccache: false
         mixkey: ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}
         prefix: ${{ env.OPENWRT_PATH }}
-    
+
+    - name: Update Feeds (Workflow)
+      run: |
+        cd $OPENWRT_PATH
+        ./scripts/feeds update -a
+
 
     - name: Load Custom Configuration(加载自定义配置)
       run: |
