@@ -1,3 +1,5 @@
+name: IPQ60XX-NOWIFI
+
 on:
   workflow_dispatch:
   schedule:
@@ -86,8 +88,8 @@ jobs:
         ccache: false
         mixkey: ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}
         prefix: ${{ env.OPENWRT_PATH }}
-        
-    - name: Install Feeds
+
+    - name: Install Feeds(安装feeds)
       run: |
         cd $OPENWRT_PATH
         ./scripts/feeds update -a
