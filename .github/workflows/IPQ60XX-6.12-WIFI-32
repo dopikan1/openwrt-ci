@@ -1,4 +1,4 @@
-name: ipq60xx-6.12-wifi-32
+name: IPQ60XX-6.12-WIFI-32
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ env:
   CACHE_TOOLCHAIN: true
   UPLOAD_BIN_DIR: false
   FIRMWARE_RELEASE: true
-  FIRMWARE_TAG: ipq60xx-6.12-wifi-32
+  FIRMWARE_TAG: IPQ60XX-6.12-WIFI-32
   TZ: Asia/Shanghai
 
 jobs:
