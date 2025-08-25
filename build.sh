@@ -1,18 +1,43 @@
 #!/bin/sh
 # shellcheck disable=SC2086,SC3043,SC2164,SC2103,SC2046,SC2155
 
+set -e
+
+# === CONFIG ===
+KERNEL_VER="6.12"                # Major.minor kernel version
+TARGET_DIR="qualcommax"          # OpenWrt target name
+PATCH_NAME="999-bbrv3.patch"     # Patch filename
+
 get_sources() {
-  # the checkout actions will set $HOME to other directory,
-  # we need to reset some necessary git configs again.
   git config --global user.name "OpenWrt Builder"
   git config --global user.email "buster-openwrt@ovvo.uk"
 
+  echo "[CLONE] Fetching OpenWrt source..."
   git clone $BUILD_REPO --single-branch -b $GITHUB_REF_NAME openwrt
 
   cd openwrt
   ./scripts/feeds update -a
   ./scripts/feeds install -a
   cd -
+
+  echo "[PATCH] Fetching BBRv3 kernel patch..."
+  # Create patch directory inside OpenWrt tree
+  PATCH_DIR="openwrt/target/linux/${TARGET_DIR}/patches-${KERNEL_VER}"
+  mkdir -p "$PATCH_DIR"
+
+  # Fetch BBRv3 patch from Google repo (adjust commit/tag if needed)
+  TMPDIR=$(mktemp -d)
+  git clone -b v3 https://github.com/google/bbr.git "$TMPDIR/bbr"
+  cd "$TMPDIR/bbr"
+
+  # Generate patch for tcp_bbr.c and related changes
+  # NOTE: You may need to adjust commit range if upstream changes
+  git format-patch -1 --stdout > "${PATCH_DIR}/${PATCH_NAME}"
+
+  cd -
+  rm -rf "$TMPDIR"
+
+  echo "[PATCH] BBRv3 patch saved to ${PATCH_DIR}/${PATCH_NAME}"
 }
 
 echo_version() {
@@ -23,25 +48,22 @@ echo_version() {
   cd configs && git log -1 && cd -
 }
 
-apply_patches() {
-  [ -d patches ] || return 0
+enable_bbrv3_config() {
+  echo "[CONFIG] Enabling BBRv3 in kernel config"
+  cat >> "configs/${BUILD_PROFILE}" <<EOF
 
-  dirname $(find patches -type f -name "*.patch") | sort -u | while read -r dir; do
-    local patch_dir="$(realpath $dir)"
-    cd "$(echo $dir | sed 's|^patches/|openwrt/|')"
-    find $patch_dir -type f -name "*.patch" | while read -r patch; do
-      git am $patch
-    done
-    cd -
-  done
+CONFIG_TCP_CONG_ADVANCED=y
+CONFIG_TCP_CONG_BBR=y
+CONFIG_DEFAULT_BBR=y
+CONFIG_DEFAULT_TCP_CONG="bbr"
+EOF
 }
 
 build_firmware() {
   cd openwrt
-
   cp ${GITHUB_WORKSPACE}/configs/${BUILD_PROFILE} .config
-  make -j$(($(nproc) + 1)) V=e || make -j1 V=sc || exit 1
-
+  make defconfig
+  make -j$(($(nproc) + 1)) V=s || make -j1 V=sc || exit 1
   cd -
 }
 
@@ -60,9 +82,10 @@ package_dl_src() {
   tar -zcvf $tarball -C $dl_dir $(ls $dl_dir -1)
 }
 
+# === MAIN ===
 get_sources
 echo_version
-apply_patches
+enable_bbrv3_config
 build_firmware
 package_binaries
 package_dl_src
