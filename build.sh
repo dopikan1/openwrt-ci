@@ -48,17 +48,6 @@ echo_version() {
   cd configs && git log -1 && cd -
 }
 
-enable_bbrv3_config() {
-  echo "[CONFIG] Enabling BBRv3 in kernel config"
-  cat >> "configs/${BUILD_PROFILE}" <<EOF
-
-CONFIG_TCP_CONG_ADVANCED=y
-CONFIG_TCP_CONG_BBR=y
-CONFIG_DEFAULT_BBR=y
-CONFIG_DEFAULT_TCP_CONG="bbr"
-EOF
-}
-
 build_firmware() {
   cd openwrt
   cp ${GITHUB_WORKSPACE}/configs/${BUILD_PROFILE} .config
