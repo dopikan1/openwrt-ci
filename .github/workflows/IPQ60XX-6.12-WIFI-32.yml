@@ -2,9 +2,8 @@ name: IPQ60XX-6.12-WIFI-32
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: 0 19 * * *
 
+  
 env:
   REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
   REPO_BRANCH: k6.12-nss
