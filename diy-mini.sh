@@ -11,6 +11,7 @@ git clone --depth=1 https://github.com/sbwml/luci-app-mosdns package/luci-app-mo
 git clone --depth=1 https://github.com/dopikan1/nf_deaf-openwrt.git package/kernel/nf_deaf
 git clone --depth=1 https://github.com/muink/luci-app-natmapt package/luci-app-natmapt
 git clone --depth=1 https://github.com/muink/openwrt-natmapt package/openwrt-natmapt
+git clone --depth=1 https://github.com/muink/openwrt-stuntman package/openwrt-stuntman
 
 
 ./scripts/feeds update -a
